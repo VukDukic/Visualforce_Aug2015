@@ -5,6 +5,7 @@
         <apex:commandButton action="{!save}" value="Save"/>
       <apex:pageBlockButtons>
       <apex:pageBlockSection title="My Content Section" columns="2">
+        <apex:outputLabel for="aName">Account Name:</apex:outputLabel>
         <apex:inputField value="{account.name}">
       </apex:pageBlockSection>
     </apex:pageBlock>
