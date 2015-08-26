@@ -1,0 +1,465 @@
+<apex:page id="page" controller="ConvertLeadOptimize" tabStyle="Lead" title="Convert Lead" action="{!validateLeadBeforeConversion}">
+    <apex:includeScript value="{!URLFOR($Resource.jquery, 'js/jquery-1.4.2.min.js')}" /> 
+    <script>
+    function doSearchonChk(btnId)
+    {
+        var getFrmBtn = document.getElementById('page:j_id17:j_id18:j_id36:btnSearch');
+        getFrmBtn.click();
+    }
+    function showOverlay() {
+        document.getElementById('internal').style.display = '';
+    }
+    function hideOverlay() {
+        document.getElementById('internal').style.display = 'none';
+    }
+    </script>
+    <style>
+        #body .pbBody table.list tr.headerRow td, body .pbBody table.list tr.headerRow th {
+            text-align: center !important;
+        }
+        .header {
+            background: #E3F3FF !important;
+            height:25px;
+            text-align:center;
+            border: none !important;
+            border-bottom:1px solid #DBDBDB !important;
+            /*border-bottom:1px solid #DBDBDB !important;
+            border-right:1px solid #DBDBDB !important;*/
+        }
+        .rowData {
+            height:25px;
+            text-align:center;
+            border: none !important;
+            /*border-bottom:1px solid #DBDBDB !important;
+            border-right:1px solid #DBDBDB !important;*/
+        }
+        .selectedRow {
+            background:#F0F0F0;
+        }
+        .overlay {
+            background-color: black;
+            opacity: 0.6;
+            /* Generic for Major browsers */
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+            /* IE 5-7 */
+            filter: alpha(opacity=60);
+            /* Netscape */
+            -moz-opacity: 0.6;
+            /* Safari 1.x */
+            -khtml-opacity: 0.6;            
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 99;
+            zIndex: 99;
+        }
+        
+        .formLabel {
+            font: Bold 16px arial;
+            text-align: left;
+            /*border: 2px solid steelblue;*/
+            float: left;
+            width: 30%;
+            margin-left: 25%;
+            margin-right: -10%;
+        }
+        
+        .upperdiv {
+            width: 100%;
+            height: 60px;
+            background-color: white;
+            height: 60px;
+            /*border: 1px solid black;*/
+            padding-left: 20px;
+            padding-right: 20px;
+            /* margin-left: 21%; */
+            box-shadow: 0px 0px 35px 5px lightgray inset;
+            /*border-radius: 10px;*/
+        }
+    
+        .lowerdiv {
+            box-shadow: 0px -71px 101px -19px #C7D6E9 inset;
+            background: #f8f8f8;
+            outline: none;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .menuOption {
+            border: 1px solid steelblue;
+            width: 60%;
+            height: 30px;
+            font: Bold 16px arial;
+            padding-top: 10px;
+            border-radius: 10px;
+            box-shadow: 0px -4px 50px -2px lightblue inset;
+            cursor: pointer;
+            background-color: white;
+        }
+        
+        .menuOption:hover {
+            background-color: white;
+            text-decoration: underline;
+            box-shadow: 0px -4px 50px -2px #dbfdab inset;
+            cursor: pointer;
+        }
+        
+     /*  .inputBox {
+            border: 2px solid steelblue;
+            width: 25%;
+            height: 25px;
+            border-radius: 5px;
+            text-align: center;
+            padding-left: 1%;
+        }*/
+      
+        .fancybox-close { 
+            position: absolute; 
+            top: 8px; 
+            right: -55px; 
+            width: 36px; 
+            height: 36px; 
+            cursor: pointer; 
+            z-index: 8040; 
+            background-image: url('http://ringcentral.box5.cs12.force.com/RCSupportPortal/resource/1365653662000/RCSupportPortal/supportPortal/img/fancybox_sprite.png');
+        }
+        
+        .requiredfield {
+            width: 3px;
+            height: 21px;
+            background: #F00;
+            /* padding-top: 0px; */
+            float: left;
+            margin-top: 2px;
+            margin-right: 2px;
+        }
+        
+        .msgPanelCls {
+            height: 30px;
+            width: auto;
+            border: 1px solid #3399FF;
+            padding: 2px;
+            background: #FFFFCC;
+            font-weight: bolder !important;
+            border-radius: 5px;
+        }
+        .datePicker {
+            z-index: 99999 !important;
+            position:fixed !important;
+        }
+        .message .messageText h4 {
+            display: none !important;
+        }
+        .message.errorM3 {
+            text-align:left !important;
+        }
+        .internal { 
+            width: 100%;
+            border: 1px solid lightblue;
+            height: 290px;
+            vertical-align: middle;
+            background: black;
+            opacity: 0.6;
+            /* Generic for Major browsers */
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+            /* IE 5-7 */
+            filter: alpha(opacity=60);
+            /* Netscape */
+            -moz-opacity: 0.6;
+            /* Safari 1.x */
+            -khtml-opacity: 0.6; 
+            border-radius: 4px;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            position: absolute;
+            top: 85px;
+            color: white;
+        }
+        .internalmsg {
+            margin-top: 18%;
+            font-weight: bolder;
+            font-size: 20px;
+        }
+        .helpText {
+            z-index: 999999;         
+        }
+    </style>
+    <apex:sectionHeader title="Convert Lead"/>         
+    <apex:pageMessage severity="error" strength="3" title="Error" rendered="{!multipleSelected}">
+    You can only select ONE account to merge into. 
+    </apex:pageMessage>
+    
+    <apex:pageMessages />
+    
+    <apex:form >
+        <apex:outputpanel id="convertBlock" rendered="{!showMandatoryFieldPanel}">
+            <div style="background: lightslategray; opacity: 0.75; position: absolute;top: 0;  width: 100%; z-index: 9999; zIndex: 9999; height:100%;"></div>
+            <apex:outputPanel rendered="true" style="position: fixed;z-index: 99999;top: 15%;left: 20%;width: 55%;" id="main">
+                <div class="upperdiv" align="center">
+                    <p style="font:Bold 25px arial; padding-top:12px;">Convert Lead</p>
+                </div>
+                <div class="lowerdiv" align="center" id="menu">
+                    <div style="width:100%;">
+                        <div class="msgPanelCls">
+                            <div style="float:left;">
+                                <apex:image style="vertical-align:middle; width:27px; height:26px;margin-top: 2px;background: url(https://c.cs3.visual.force.com/img/msg_icons/info24.png) no-repeat;" url="/s.gif"/>
+                            </div>
+                            <div style="float:left;margin-top:6px;">
+                                <apex:outputpanel style="vertical-align:middle; color: red; font: 12px arial; padding:2px;" id="errorForm" >{!impErrorMsg}</apex:outputpanel>
+                            </div>
+                        </div>
+                    </div>
+                    <p/>
+                    <div class="formLabel">Forecasted Users</div>
+                    <div style="text-align: left;">
+                        <div class="requiredfield"/>
+                        <apex:inputField value="{!leadObj.Number_of_Users__c}" id="forecastedUser" required="true" style="width:21%;"/>
+                    </div>
+                    <p/>
+                    <div class="formLabel">RC Brand</div>
+                    <div style="text-align: left;">
+                        <div class="requiredfield"/>
+                        <apex:inputField value="{!leadObj.Lead_Brand_Name__c}" id="brand" required="true" style="width:21%;"/>
+                    </div>
+                    <p/>
+                    <div class="formLabel">RC Tier</div>
+                    <div style="text-align: left;width:21%;">
+                        <div class="requiredfield"/>
+                        <apex:inputField value="{!leadObj.Lead_Tier_Name__c}" id="tier" required="true" style="width:21% !important;"/>
+                    </div>
+                    <p/>
+                                       
+                    <div class="internal" id="internal" style="background: lightslategray; opacity: 0.75; position: absolute;top: 0;  width: 100%; z-index: 9999; zIndex: 9999; height:100%;display:{!IF(showMandatoryFieldPanel,'none', 'block')}">
+                        <div class="internalmsg">Please wait...</div>
+                    </div>
+                    <div style="height: 1%;">&nbsp;</div>
+                    <div> 
+                        <apex:commandButton styleclass="btn" value="Continue" action="{!saveLeadBeforeConversion}" status="counterStatus" rerender="page" >
+                            <apex:actionStatus id="counterStatus" onStart="showOverlay('internal');" onstop="hideOverlay('internal');"/>
+                        </apex:commandButton> 
+                        <apex:commandButton styleclass="btn" value="Cancel" status="counterStatusNew" onclick="window.open('/{!leadObj.Id}','_self');return false;"/>
+                    </div>
+                </div>
+                <a class="fancybox-item fancybox-close" href="/{!leadObj.Id}" title="Close"></a>
+                         
+            </apex:outputPanel>
+        </apex:outputpanel>    
+    
+    
+    
+    
+    
+     <!-- code by India Team 02Sep  -->        
+        <apex:pageBlock title="Initial Category is Blank" rendered="{!Initial_CategoryFlag}">               
+            <apex:pageMessage severity="info" strength="1">
+                You are not allowed to convert this Lead because Initial Category is blank. Please select a Initial Category
+            </apex:pageMessage> 
+             <apex:selectRadio value="{!initialCategory}" layout="pagedirection" 
+             onclick="doSearchonChk('{!$Component.btnSearch}')">
+                            <apex:selectOptions value="{!listInitialCategoryItems}" />
+             </apex:selectRadio>
+            <apex:pageblockButtons >
+            <apex:commandButton id="btnSearch" value="Search" action="{!updateLeadCategory}" style="display:none;"/>              
+            </apex:pageblockButtons> 
+                    
+        </apex:pageBlock>
+        
+        <!-- End -->
+        
+        
+        <apex:pageBlock title="Matching Accounts" >
+            <apex:pageblockButtons >
+                <apex:commandButton action="{!convertAndMerge}" value="Convert"/>  
+                 <apex:commandButton action="{!URLFOR($Action.Lead.view, l.id)}" value="Cancel" immediate="true"/>   
+            </apex:pageblockButtons>        
+            <apex:pageMessage severity="info" strength="1" rendered="{!matchFound}">
+                There are matching Accounts. Please select one below to merge your new Opportunity into.
+            </apex:pageMessage>          
+            <apex:pageMessage severity="info" strength="1" rendered="{!matchNotFound}">
+                There are no Accounts with matching contact phone or email data. Please select Create New.            
+            </apex:pageMessage>           
+            <apex:pageMessage severity="error" strength="1" rendered="{!notAnswered}">
+                You must select a Account.            
+            </apex:pageMessage>
+            
+            
+            
+            
+            <apex:pageBlockTable value="{!accounts}" var="a" id="table">
+                <apex:column >
+                    <!-- This is the selected Boolean property in the Wrapper class -->
+                    <apex:inputCheckbox value="{!a.selected}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><b>Account Name (Click to view in new tab)</b></apex:facet>
+                    <apex:outputLink rendered="{!a.acc.Name != 'Create New'}" value="{!urlFor($Action.Account.View, a.acc.Id)}" target="_blank">
+                        {!a.acc.Name}
+                    </apex:outputLink>
+                    <apex:outputText rendered="{!a.acc.Name == 'Create New'}" value="{!a.acc.Name}"/>
+                </apex:column>        
+                <apex:column >
+                    <apex:facet name="header"><b>RC User ID</b></apex:facet>
+                    <apex:outputLink rendered="{!a.acc.Name != 'Create New'}" value="{!urlFor($Action.Account.View, a.acc.Id)}" target="_blank">
+                        {!a.acc.RC_User_ID__c}
+                    </apex:outputLink>
+                </apex:column>              
+                <apex:column >
+                    <apex:facet name="header"><b>RC Account Number</b></apex:facet>
+                    <apex:outputLink rendered="{!a.acc.Name != 'Create New'}" value="{!urlFor($Action.Account.View, a.acc.Id)}" target="_blank">
+                        {!a.acc.RC_Account_Number__c}
+                    </apex:outputLink>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><b>RC Account Status</b></apex:facet>
+                    <apex:outputLink rendered="{!a.acc.Name != 'Create New'}" value="{!urlFor($Action.Account.View, a.acc.Id)}" target="_blank">
+                        {!a.acc.RC_Account_Status__c}
+                    </apex:outputLink>
+                </apex:column>                
+            </apex:pageBlockTable>             <BR/>
+            <apex:outputLabel value="Select a known Account: " for="accountSelector"/>
+            <apex:inputField id="accountSelector" value="{!l.Account__c}"/>
+            <!--  <apex:inputField value="{!acct.Id}"/> -->
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<apex:outputLabel value="Create a new Account: " for="createNew"/>
+            <apex:inputCheckbox id="createNew" value="{!createNew}"/>
+            
+             <br/><br/>
+            <div style="width:100%;border-top: 1px solid #DBDBDB;height:15px;padding-bottom: 10px;padding-top: 10px;">
+                <div class="pbTitle" style="padding: 0px">
+                    <h2 class="mainTitle">Available Qualifications</h2>
+                </div>
+            </div>
+            
+            <div  id="listDiv">
+                <apex:outputPanel rendered="{!if(wrLeadQualList.size>0,true,false)}">
+                    <table cellspacing="0" cellpadding="0" style="width:100%;border:1px solid #DBDBDB !important;">
+                        <thead>
+                            <tr>
+                            <th class="header" style="border-right:1px solid #DBDBDB !important;">Select</th>
+                            <th class="header" style="border-right:1px solid #DBDBDB !important;">Lead Qualification</th>
+                            <th class="header" style="border-right:1px solid #DBDBDB !important;">Lead</th>
+                            <th class="header" style="border-right:1px solid #DBDBDB !important;">Account</th>
+                            <th class="header" style="border-right:1px solid #DBDBDB !important;">Opportunity</th>
+                            <th class="header" >Last Modified Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <apex:variable var="Index" value="1" />
+                        <apex:variable var="bottomcss" value="border-bottom: 1px solid #DBDBDB !important;"/>
+                        <apex:variable var="lastRow" value="border:1px solid #DBDBDB"/>
+                        <apex:repeat var="o" value="{!wrLeadQualList}">
+                            <tr class="{!IF(VALUE(Index) == 1, 'selectedRow', '')}">
+                                <td class="rowData" style="border-right:1px solid #DBDBDB !important;{!IF(VALUE(Index) != wrLeadQualList.size, bottomcss, '')}">
+                                <input type="radio" Name="LQSelection" onchange="loadLeadQualDet('{!o.leadQualObj.Id}');" id="{!o.leadQualObj.Id}" class="inputselect" value="{!o.leadQualObj.Id}" /></td>
+                                <td class="rowData" style="border-right:1px solid #DBDBDB !important;{!IF(VALUE(Index) != wrLeadQualList.size, bottomcss, '')}">
+                                    <apex:outputLink value="/{!o.leadQualObj.Id}"  target="_blank">
+                                    <apex:outputText value="{!o.leadQualObj.Name}"/>     
+                                    </apex:outputLink>&nbsp;
+                                </td>
+                                <td class="rowData" style="border-right:1px solid #DBDBDB !important;{!IF(VALUE(Index) != wrLeadQualList.size, bottomcss, '')}">
+                                    <apex:outputLink value="{!if(Isblank(o.leadQualObj.Lead__c),o.leadQualObj.Lead__c,urlFor($Action.Lead.View, o.leadQualObj.Lead__c))}"  target="_blank">
+                                    <apex:outputText value="{!o.leadQualObj.Lead__r.Name}"/>     
+                                </apex:outputLink>&nbsp;
+                                </td>
+                                <td class="rowData" style="border-right:1px solid #DBDBDB !important;{!IF(VALUE(Index) != wrLeadQualList.size, bottomcss, '')}">
+                                    <apex:outputLink value="{!if(Isblank(o.leadQualObj.Account__c),o.leadQualObj.Account__c,urlFor($Action.Account.View, o.leadQualObj.Account__c))}" target="_blank">
+                                    <apex:outputText value="{!o.leadQualObj.Account__r.Name}"/>    
+                                </apex:outputLink>&nbsp;
+                                </td>
+                                <td class="rowData" style="border-right:1px solid #DBDBDB !important;{!IF(VALUE(Index) != wrLeadQualList.size, bottomcss, '')}">
+                                    <apex:outputLink value="{!if(Isblank(o.leadQualObj.Opportunity__c),o.leadQualObj.Opportunity__c,urlFor($Action.Opportunity.View, o.leadQualObj.Opportunity__c))}"  target="_blank">
+                                     <apex:outputText value="{!o.leadQualObj.Opportunity__r.Name}"/>    
+                                </apex:outputLink>&nbsp;
+                                </td>
+                                 <td class="rowData" style="border-right:1px solid #DBDBDB !important;{!IF(VALUE(Index) != wrLeadQualList.size, bottomcss, '')}">
+                                      <!--<apex:outputText value="{0,date,dd'/'MM'/'yyyy HH:mm a}">
+                                           <apex:param value="{!o.leadQualObj.LastModifiedDate}"/> {!o.leadQualObj.LastModifiedDate} ---
+                                      </apex:outputText>-->
+                                      <apex:outputText value="{!o.strformatDT}">
+                                           <!--<apex:param value="{!o.strformatDT}"/> {!o.strformatDT} ----->
+                                      </apex:outputText>
+                               </td>
+                            </tr>
+                            <apex:variable var="Index" value="{!VALUE(Index)+1}" />
+                        </apex:repeat>
+                        </tbody>
+                        </table> 
+                    </apex:outputPanel>
+                    <apex:pageMessage summary="No Lead Qualifications." severity="info" strength="1"  rendered="{!if(wrLeadQualList.size>0,false,true)}"/> 
+                </div>
+            <!-- <apex:outputPanel id="LeadQualPanel">
+                {!selectedLeadQual}        
+            </apex:outputPanel>-->
+
+        </apex:pageBlock>
+        <apex:actionSupport action="{!convert}"/>  
+        <BR/>              
+        <apex:pageBlock title="Protected ActivePipe Opportunities">
+                <!-- code added by India team 22 july 2010 -->      
+               <apex:pageBlockTable value="{!Opportunities}" var="o" id="table1">
+                <apex:column >
+                   <apex:facet name="header"><b>Opportunity</b></apex:facet>
+                  <apex:outputLink value="{!urlFor($Action.Opportunity.View, o.opportunity.Id)}" target="_blank">
+                       {!o.oppName }
+                 </apex:outputLink>
+                </apex:column>
+                <apex:column >
+                      <apex:facet name="header"><b>Owner</b></apex:facet>
+                       {!o.owner}
+                 </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><b>Account</b></apex:facet>
+                    {!o.accountName} 
+                </apex:column>                             
+                <apex:column >
+                     <apex:facet name="header"><b>Status</b></apex:facet>
+                    {!o.status}
+                </apex:column>  
+                 <apex:column >
+                    <apex:facet name="header"><b>Created Date</b></apex:facet>
+                    {!o.createdDate} 
+                </apex:column>                             
+                <apex:column >
+                     <apex:facet name="header"><b>Last Touched Date</b></apex:facet>
+                    {!o.lastTouchedDate}
+                </apex:column> 
+                <!-- code ended by India team 22 july 2010-->
+            </apex:pageBlockTable>        
+        </apex:pageBlock>
+        
+        <script>
+            var prevselected;
+            $(document).ready(function() {
+                $("table tr td input[name=LQSelection]:radio").click(function(srcc) {
+                    try {
+                        $(".inputselect").closest('tr').css('background-color', 'transparent'); 
+                        $(this).closest('tr').css('background-color', '#C7D6E9');
+                    } catch(e) {alert(e);}
+                });
+            });
+            
+           function selectRow() {
+                var selectedVal = '{!selectedLeadQual}';
+                $("table tr td input[name=LQSelection]:radio").each(function() {
+                    if(selectedVal != "" && $(this).val() != "") {
+                        if(selectedVal == $(this).val()) {
+                            prevselected = $(this).val();
+                            $(this).attr("checked",true);
+                            $(this).closest('tr').css('background-color', '#C7D6E9');
+                        }
+                    }
+                });
+            }
+            selectRow(); 
+            
+            function loadLeadQualDet(id) { 
+                loadLeadQualDet1(id);
+            }
+        </script> 
+        
+        <apex:actionFunction name="loadLeadQualDet1" action="{!loadLeadQualDet}" rerender="LeadQualPanel" status="ajaxStatus"> 
+            <apex:Param name="param1" value="" />
+        </apex:actionFunction>       
+     </apex:form>
+</apex:page>
