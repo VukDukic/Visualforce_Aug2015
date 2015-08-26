@@ -1,4 +1,4 @@
-<apex:page controller="MyController1">
+<apex:page controller="myController">
   <apex:form>
     <apex:pageBlock title="My Content" mode="edit">
       <apex:pageBlockButtons>
