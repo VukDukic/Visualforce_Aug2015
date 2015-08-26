@@ -1,0 +1,18 @@
+public with sharing class myController {
+    
+  private final Id accountId&nbsp;;
+  transient public final String accountName  {get; set;}
+  
+  public myController() {
+    Account account = [select name from Account where id = &nbsp;:ApexPages.currentPage().getParameters().get('id')];
+      accountId = account.Id&nbsp;;
+      accountName = account.Name&nbsp;
+    }
+    
+    public PageReference save() {
+      Account myAccount = [select name from Account where id = &nbsp;:accountId];
+      myAccount.Name = accountName&nbsp;;
+      update account;
+      return null;
+    }
+}
