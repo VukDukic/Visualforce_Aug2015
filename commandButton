@@ -1,0 +1,7 @@
+<apex:commandButton action="{!list}" value="List"/>
+<apex:commandButton action="{!view}" value="View"/>
+<apex:commandButton action="{!cancel}" value="cancel"/>
+<apex:commandButton action="{!save}" value="save"/>
+<apex:commandButton action="{!quickSave}" value="Quick Save"/>
+<apex:commandButton action="{!edit}" value="Edit"/>
+<apex:commandButton action="{!delete} value="Delete"/>
