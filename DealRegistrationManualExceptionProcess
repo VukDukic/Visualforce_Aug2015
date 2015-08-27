@@ -1,0 +1,12 @@
+
+String partnerAgentName = 'test';
+String partnerAgentId = 'test';
+String company = 'test';
+String firstName = 'test';
+String lastName = 'test';
+String email = 'A.ames4@ntlworld.com';
+String phone = '0208 661 8882';
+String numberOfEmployees = '24';
+String zipCode = 'A1234';
+String outStr = DealRegistrationSubmissionCls.submitDealRegistration(partnerAgentName, partnerAgentId, company, firstName, lastName,  email, phone, numberOfEmployees, zipCode);
+system.debug('outStr===>'+outStr);
