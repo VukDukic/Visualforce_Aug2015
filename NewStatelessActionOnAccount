@@ -1,0 +1,1 @@
+<apex:outputLink value="{!URLFOR(Action.Account.New)}" >New Account</apex:outputLink>
