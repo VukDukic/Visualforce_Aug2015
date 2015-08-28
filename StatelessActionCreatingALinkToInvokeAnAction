@@ -1,0 +1,3 @@
+<apex:outputLink value="{!URLFOR(target, id or $ObjectType, [inputs], [no override])}">
+    <!-- Do Something -->
+</apex:outputLink>
