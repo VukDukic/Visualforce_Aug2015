@@ -1,0 +1,14 @@
+public List<Opportunity> childOpps {
+    get {
+        if (childOpps = null)
+        {
+            childOpps = [Select Name, Amount, StageName, CloseDate,
+OwnerId, IsClosed
+                From Opportunity
+                Where AccountId = :acct.Id
+    and (IsWon = true or IsClosed = false)];
+    }
+    return childOpps;
+  }
+  set;
+}
