@@ -1,0 +1,23 @@
+public class CustomController {
+
+  public Account acct {get;set;}
+
+  public CustomController() {
+    String acctId = ApexPages.currentPage().getParameters().get('id');
+    acct = [Select Rating From Account Where Id = :acctId];
+  }
+
+  public PageReference save() {
+    update acct;
+    return new PageReference('/' + acct.Id);
+  }
+}
+
+<apex:page controller="CustomController">
+  <apex:form>
+    <apex:pageBlock>
+      <apex:inputField value="{!acct.Rating}"/>
+      <apex:commandButton action="{!save}" value="Save"/>
+    </apex:pageBlock>
+  </apex:form>
+<apex:page>
