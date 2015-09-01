@@ -1,0 +1,2 @@
+// Add the transient keyword to properties to prevent them from being included in the view state
+transient public List<Lead> allLeadsCreatedThisYear = [Select Name, Id From Lead Limit 50000];
